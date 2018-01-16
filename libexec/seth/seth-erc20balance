@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+### seth-erc20balance -- show the balance of any account on the blockchain
+### Usage: seth erc20balance <erc20> <account>
+### Print the ERC20 balance of <account>.
+###
+set -e
+#error out and display help if address not recognized
+[[ $1 ]] || seth --fail-usage "$0"
+[[ $3 ]] && third=$3
+erc20=$1
+account=$2
+# check to see if address name is defined in .sethrc
+[[ $account = @* ]] && account=$(seth lookup "$account")
+[[ $erc20 = @* ]] && erc20=$(seth lookup "$erc20")
+# get decimals from ERC20 contract
+decimals=$(seth call "$erc20" 'decimals()')
+decimals=$(seth --to-dec "$decimals")
+
+# get balance and convert to decimal
+balance=$(seth call "$erc20" 'balanceOf(address)' "$account")
+[[ $balance = 0x* ]] && balance=$(seth --to-dec $balance)
+# convert decimal to appropriate type
+bal=$(seth --to-fix "$decimals" "$balance")
+bal=$(sed 's/\.\?0*$//' <<<"$bal")
+echo "${bal}" "$third"

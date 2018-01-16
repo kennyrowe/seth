@@ -2,15 +2,12 @@
 ### seth-ls -- display a list of your local accounts and balances
 set -e
 accounts=$(seth accounts | awk '{print $1}')
-price=$(seth call 0xE3774Af455602C5a0EACC1b0f93e3cE0f65236ce 'read()')
-price=$(seth --to-dec "$price")
-price=$(seth --to-fix 18 "$price")
+price=$2
 total=0
+erc20=$1
 for x in $accounts; do
-  balance=$(seth balance $x)
+  balance=$(seth erc20balance $erc20 $x)
   total=$(bc <<< "$total + $balance");
   printf "%s\t%s\t%s\t%s\n" "$x" "$balance"  "$""$(bc <<< "scale=2;$price * $balance / 1")"
 done
 printf "\n%s\t%s\t%s\t%s\n" "Total:" "$total"  "$""$(bc <<< "scale=2;$price * $total / 1")"
-
-#                                    

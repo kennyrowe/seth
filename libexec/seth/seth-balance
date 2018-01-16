@@ -14,4 +14,4 @@ balance=$(seth rpc eth_getBalance -- "${jshon[@]}")
 [[ $balance = 0x* ]] && balance=$(seth --to-dec "$balance")
 eth=$(seth --to-fix 18 "$balance")
 eth=$(sed 's/\.\?0*$//' <<<"$eth")
-echo "${eth}E+18"
+echo "${eth}"
